@@ -41,7 +41,7 @@ app.use('/leaders', leaderRouter);
 const mongoose = require('mongoose');
 const Dishes = require('./models/dishes');
 
-const url = config.url;
+const url = config.mongoUrl;
 const connect = mongoose.connect(url);
 
 connect.then((db) => {
