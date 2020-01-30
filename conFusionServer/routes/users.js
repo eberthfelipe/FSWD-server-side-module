@@ -4,6 +4,7 @@ var User = require('../models/user');
 var passport = require('passport');
 var authenticate = require('../authenticate');
 var cors = require('./cors');
+
 var router = express.Router();
 router.use(bodyParser.json());
 
