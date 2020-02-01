@@ -76,7 +76,7 @@ favoriteRouter.route('/')
         res.end('PUT operation not supported on /favorites/');
     })
     .delete(cors.corsWithOptions, authenticate.verifyUser, (req, res, next) => {
-        Favorites.remove({})
+        Favorites.findOneAndRemove({user: req.user._id})
         .then((resp) => {
             res.statusCode = 200;
             res.setHeader('Content-Type', 'application/json');
