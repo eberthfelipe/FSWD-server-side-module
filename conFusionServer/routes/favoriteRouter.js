@@ -28,20 +28,48 @@ favoriteRouter.route('/')
     })
     .post(cors.corsWithOptions, authenticate.verifyUser, (req, res, next) => {
         console.log("req:", req.body);
-        Favorites.create({user: req.user._id})
+        Favorites.findOne({user: req.user._id})
         .then((favorites) => {
-            for(var i = (req.body.length - 1); i >=0; i--){
-                favorites.dishes.push(mongoose.Types.ObjectId(req.body[i]._id));
+            if (favorites != null){
+                console.log("favorite: ", favorites);
+                if (favorites != null){
+                    var exists = false;
+                    for(var i = (req.body.length - 1); i >=0; i--){
+                        for(var x = (favorites.dishes.length - 1); x >=0; x--){
+                            if(favorites.dishes[x]._id == req.body[i]._id){
+                                exists = true;
+                                break;
+                            }
+                        }
+                        if(!exists){
+                            favorites.dishes.push(mongoose.Types.ObjectId(req.body[i]._id));
+                        }
+                    }
+                    favorites.save()
+                    .then((favorites) => {
+                        res.statusCode = 200;
+                        res.setHeader('Content-Type', 'application/json');
+                        res.json(favorites);
+                    }, (err) => next(err))
+                    .catch((err) => next(err));
+                }
+            } else {
+                Favorites.create({user: req.user._id})
+                .then((favorites) => {
+                    for(var i = (req.body.length - 1); i >=0; i--){
+                        favorites.dishes.push(mongoose.Types.ObjectId(req.body[i]._id));
+                    }
+                    favorites.save()
+                    .then((favorites) => {
+                        res.statusCode = 200;
+                        res.setHeader('Content-Type', 'application/json');
+                        res.json(favorites);
+                    }, (err) => next(err))
+                }, (err) => next(err))
+                .catch((err) => next(err));
             }
-            favorites.save()
-            .then((favorites) => {
-                res.statusCode = 200;
-                res.setHeader('Content-Type', 'application/json');
-                res.json(favorites);
-            }, (err) => next(err))
         }, (err) => next(err))
         .catch((err) => next(err));
-        
     })
     .put(cors.corsWithOptions, authenticate.verifyUser, (req, res, next) => {
         res.statusCode = 403;
